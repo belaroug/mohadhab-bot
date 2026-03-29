@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فهرس كتاب المهذب التفاعلي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root { --primary: #2c3e50; --gold: #c9a050; --bg: #f4f7f6; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg); margin: 0; padding: 15px; line-height: 1.6; }
+        .container { max-width: 600px; margin: auto; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); min-height: 90vh; }
+        header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
+        
+        /* تصميم الفهرس */
+        .chapter-box { margin-bottom: 12px; }
+        .main-btn { width: 100%; text-align: right; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 17px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .main-btn:active { transform: scale(0.98); }
+        
+        .sub-menu { display: none; background: #fff; border: 1px solid #eee; border-radius: 0 0 10px 10px; overflow: hidden; animation: fadeIn 0.3s; }
+        .sub-menu.active { display: block; }
+        .sub-item { display: block; padding: 14px; color: #333; text-decoration: none; border-bottom: 1px solid #f9f9f9; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        .sub-item:hover { background: #fff9ed; color: var(--gold); padding-right: 20px; }
+
+        /* منطقة المحتوى */
+        #content-area { display: none; animation: fadeIn 0.4s; }
+        .back-btn { background: #eee; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; margin-bottom: 20px; font-weight: bold; color: var(--primary); }
+        .section-box { background: #fdfaf3; padding: 15px; border-radius: 12px; border-right: 4px solid var(--gold); margin-bottom: 25px; }
+        .text-view { font-size: 18px; color: #333; text-align: justify; white-space: pre-wrap; }
+        
+        /* تصميم الأسئلة والاختبارات */
+        .qa-item { background: white; border: 1px solid #eee; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        .quiz-option { display: block; width: 100%; text-align: right; margin: 8px 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; font-family: 'Tajawal'; transition: 0.2s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="home-view">
+        <header>
+            <h1 style="font-size: 22px; color: var(--primary); margin: 0;">المهذب في أصول الفقه</h1>
+            <p style="color: #666; font-size: 14px;">نظام الدراسة التفاعلي</p>
+        </header>
+
+        <div class="chapter-box">
+            <button class="main-btn" onclick="toggleMenu('m1')">الباب الأول: المقدمات <span>▼</span></button>
+            <div id="m1" class="sub-menu">
+                <div class="sub-item" onclick="loadContent('intro')">📄 مقدمة الكتاب</div>
+                <div class="sub-item" onclick="loadContent('mabadi')">📄 الفصل الأول: مبادئ علم أصول الفقه</div>
+            </div>
+        </div>
+
+        <div class="chapter-box">
+            <button class="main-btn" onclick="toggleMenu('m2')">الباب الثاني: الحكم الشرعي <span>▼</span></button>
+            <div id="m2" class="sub-menu">
+                <div class="sub-item" style="color:#999; cursor:default;">قريباً...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-area">
+        <button class="back-btn" onclick="showHome()">⬅ العودة للفهرس</button>
+        <h2 id="content-title" style="color:var(--primary); margin-bottom:20px;"></h2>
+        <div id="dynamic-content"></div>
+    </div>
+</div>
+
+<script>
+    // تفعيل WebApp
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function toggleMenu(id) {
+        const el = document.getElementById(id);
+        el.classList.toggle('active');
+    }
+
+    async function loadContent(key) {
+        try {
+            const response = await fetch('content.json');
+            const data = await response.json();
+            const item = data[key];
+
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('content-area').style.display = 'block';
+            document.getElementById('content-title').innerText = item.title;
+
+            let html = '';
+
+            // 1. عرض النص الكامل
+            if(item.full_text) {
+                html += `<div class="section-box">
+                            <h3 style="margin-top:0; color:var(--gold);">📖 المتن:</h3>
+                            <div class="text-view">${item.full_text}</div>
+                         </div>`;
+            }
+
+            // 2. عرض سؤال وجواب (س/ج)
+            if(item.qa) {
+                html += `<h3 style="color:var(--primary);">💡 تلخيص (سؤال وجواب):</h3>`;
+                item.qa.forEach(pair => {
+                    html += `<div class="qa-item">
+                                <div style="font-weight:bold; color:var(--primary); margin-bottom:5px;">س: ${pair.q}</div>
+                                <div style="color:#555;">ج: ${pair.a}</div>
+                             </div>`;
+                });
+            }
+
+            // 3. عرض الاختبارات التفاعلية
+            if(item.quiz) {
+                html += `<h3 style="color:var(--primary); margin-top:30px;">📝 اختبار قصير:</h3>`;
+                item.quiz.forEach((q, qIdx) => {
+                    html += `<div style="background:#f0f4f8; padding:15px; border-radius:12px; margin-bottom:20px;">
+                                <p style="font-weight:bold; margin-top:0;">${q.question}</p>`;
+                    q.options.forEach((opt, optIdx) => {
+                        html += `<button class="quiz-option" onclick="checkAnswer(${optIdx}, ${q.answer}, this)">
+                                    ${opt}
+                                 </button>`;
+                    });
+                    html += `</div>`;
+                });
+            }
+
+            document.getElementById('dynamic-content').innerHTML = html;
+            window.scrollTo(0,0);
+        } catch (e) {
+            alert("خطأ في تحميل المحتوى، تأكد من وجود ملف content.json");
+        }
+    }
+
+    function checkAnswer(selected, correct, btn) {
+        if(selected === correct) {
+            btn.style.background = "#d4edda";
+            btn.style.borderColor = "#28a745";
+            btn.innerHTML += " ✅";
+        } else {
+            btn.style.background = "#f8d7da";
+            btn.style.borderColor = "#dc3545";
+            btn.innerHTML += " ❌";
+        }
+        // منع الضغط المتكرر
+        const parent = btn.parentElement;
+        const buttons = parent.querySelectorAll('button');
+        buttons.forEach(b => b.onclick = null);
+    }
+
+    function showHome() {
+        document.getElementById('home-view').style.display = 'block';
+        document.getElementById('content-area').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
