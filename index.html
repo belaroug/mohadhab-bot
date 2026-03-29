@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فهرس كتاب المهذب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root { --primary: #2c3e50; --gold: #c9a050; --bg: #f4f7f6; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .container { max-width: 600px; margin: auto; background: white; border-radius: 15px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        header { text-align: center; border-bottom: 2px solid var(--gold); margin-bottom: 20px; padding-bottom: 10px; }
+        
+        .chapter-box { margin-bottom: 10px; border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+        .main-btn { width: 100%; text-align: right; padding: 15px; background: var(--primary); color: white; border: none; cursor: pointer; font-size: 16px; display: flex; justify-content: space-between; }
+        
+        .sub-menu { display: none; background: #fff; }
+        .sub-menu.active { display: block; }
+        
+        /* تصميم الفصول والمباحث */
+        .section-header { background: #f9f9f9; padding: 10px; font-weight: bold; color: var(--gold); border-bottom: 1px solid #eee; font-size: 14px; }
+        .sub-item { display: block; padding: 12px 25px; color: #333; text-decoration: none; border-bottom: 1px solid #f1f1f1; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .sub-item:hover { background: #fff9ed; color: var(--gold); }
+
+        #content-area { display: none; }
+        .back-btn { background: #eee; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 15px; font-family: 'Tajawal'; }
+        .text-view { line-height: 1.8; font-size: 18px; text-align: justify; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="home-view">
+        <header>
+            <h1 style="font-size: 18px; margin:0;">المهذب في علم أصول الفقه المقارن</h1>
+            <p style="font-size: 12px; color: #666;">الفهرس التفصيلي للجزء الأول</p>
+        </header>
+
+        <div class="chapter-box">
+            <button class="sub-item" style="width:100%; font-weight:bold;" onclick="loadContent('intro')">📄 مقدمة الكتاب</button>
+        </div>
+
+        <div class="chapter-box">
+            <button class="main-btn" onclick="toggleMenu('p1')">الباب الأول: المقدمات <span>▼</span></button>
+            <div id="p1" class="sub-menu">
+                <div class="section-header">الفصل الأول: مقدمة في مبادئ علم أصول الفقه</div>
+                <div class="sub-item" onclick="loadContent('mabadi_1')">المبحث الأول: تعريف أصول الفقه</div>
+                <div class="sub-item" onclick="loadContent('mabadi_2')">المبحث الثاني: الفرق بين أصول الفقه والفقه</div>
+                <div class="sub-item" onclick="loadContent('mabadi_3')">المبحث الثالث: الفرق بين القواعد الأصولية والفقهية</div>
+                <div class="sub-item" onclick="loadContent('mabadi_4')">المبحث الرابع: موضوع أصول الفقه</div>
+                <div class="sub-item" onclick="loadContent('mabadi_10')">المبحث العاشر: نشأة علم أصول الفقه</div>
+                
+                <div class="section-header">الفصل الثاني: المصطلحات الأصولية</div>
+                <div class="sub-item" onclick="loadContent('terms')">مدخل المصطلحات التي يحتاجها الدارس</div>
+            </div>
+        </div>
+
+        <div class="chapter-box">
+            <button class="main-btn" onclick="toggleMenu('p2')">الباب الثاني: الحكم الشرعي والتكليف <span>▼</span></button>
+            <div id="p2" class="sub-menu">
+                <div class="sub-item" onclick="loadContent('hukm')">تعريف الحكم الشرعي وأقسامه</div>
+            </div>
+        </div>
+
+        <div class="chapter-box">
+            <button class="main-btn" onclick="toggleMenu('p3')">الباب الثالث: أدلة الأحكام الشرعية <span>▼</span></button>
+        </div>
+        <div class="chapter-box">
+            <button class="main-btn" onclick="toggleMenu('p4')">الباب الرابع: الألفاظ ودلالتها <span>▼</span></button>
+        </div>
+    </div>
+
+    <div id="content-area">
+        <button class="back-btn" onclick="showHome()">⬅ عودة للفهرس</button>
+        <h2 id="content-title" style="color:var(--primary); font-size: 18px; border-right: 4px solid var(--gold); padding-right: 10px;"></h2>
+        <div id="dynamic-content"></div>
+    </div>
+</div>
+
+<script>
+    function toggleMenu(id) {
+        document.getElementById(id).classList.toggle('active');
+    }
+
+    async function loadContent(key) {
+        try {
+            const response = await fetch('content.json');
+            const data = await response.json();
+            const item = data[key];
+
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('content-area').style.display = 'block';
+            document.getElementById('content-title').innerText = item.title;
+
+            let html = `<div class="text-view">${item.full_text}</div>`;
+            
+            if(item.qa) {
+                html += `<h3 style="color:var(--gold); border-top:1px solid #eee; padding-top:15px;">💡 تثبيت المعلومات:</h3>`;
+                item.qa.forEach(pair => {
+                    html += `<p><b>س: ${pair.q}</b><br>ج: ${pair.a}</p>`;
+                });
+            }
+
+            document.getElementById('dynamic-content').innerHTML = html;
+            window.scrollTo(0,0);
+        } catch (e) {
+            alert("المحتوى جاري تحضيره في ملف content.json");
+        }
+    }
+
+    function showHome() {
+        document.getElementById('home-view').style.display = 'block';
+        document.getElementById('content-area').style.display = 'none';
+    }
+
+    window.Telegram.WebApp.ready();
+</script>
+
+</body>
+</html>
