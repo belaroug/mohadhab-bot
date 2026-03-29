@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دراسة كتاب المهذب - المبحث الأول</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #18bc9c;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--secondary-color);
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 { color: var(--primary-color); font-size: 24px; }
+        h2 { color: var(--secondary-color); border-right: 5px solid var(--secondary-color); padding-right: 10px; }
+
+        .section { display: none; animation: fadeIn 0.5s; }
+        .section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-item {
+            background: #eef9f7;
+            padding: 15px;
+            border-right: 4px solid var(--secondary-color);
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .question { font-weight: bold; color: var(--primary-color); display: block; margin-bottom: 5px; }
+        .answer { color: #555; }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 10px 25px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: 0.3s;
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        button:hover { background-color: var(--secondary-color); }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .badge {
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 id="bookTitle">كتاب المهذب</h1>
+        <p id="authorName"></p>
+    </header>
+
+    <div id="contentSection" class="section active">
+        <div class="badge">شرح المبحث</div>
+        <h2 id="chapterTitle"></h2>
+        <div id="mainContent" class="content-box"></div>
+    </div>
+
+    <div id="quizSection" class="section">
+        <div class="badge">اختبر استيعابك</div>
+        <h2>الأسئلة والأجوبة</h2>
+        <div id="quizContainer"></div>
+    </div>
+
+    <div class="nav-buttons">
+        <button id="prevBtn" onclick="toggleView('content')" disabled>عرض الشرح</button>
+        <button id="nextBtn" onclick="toggleView('quiz')">انتقل للأسئلة والأجوبة</button>
+    </div>
+</div>
+
+<script>
+    // البيانات التي كانت في ملف JSON
+    const data = {
+        "book_title": "المهذب في علم أصول الفقه المقارن",
+        "author": "د. عبد الكريم النملة",
+        "chapters": [
+            {
+                "chapter_name": "المبحث الأول: تعريف أصول الفقه",
+                "content": {
+                    "introduction": "دراسة تعريف أصول الفقه تتطلب النظر إليه من زاويتين: الأولى كونه مركباً إضافياً، والثانية كونه لقباً على فن مخصوص.",
+                    "sections": [
+                        {"title": "1. تعريف (الأصول)", "details": "جمع أصل، وهو ما ينبني عليه غيره. وفي الاصطلاح هنا يراد به (الدليل)."},
+                        {"title": "2. تعريف (الفقه)", "details": "العلم بالأحكام الشرعية العملية المكتسبة من أدلتها التفصيلية."},
+                        {"title": "3. التعريف اللقبي", "details": "العلم بالقواعد التي يتوصل بها إلى استنباط الأحكام الشرعية العملية من أدلتها التفصيلية."}
+                    ]
+                },
+                "quiz": [
+                    { "question": "ما المقصود بـ 'الأصل' اصطلاحاً في هذا العلم؟", "answer": "يقصد به 'الدليل'." },
+                    { "question": "لماذا يخرج علم التوحيد من تعريف الفقه؟", "answer": "لأن الفقه يختص بالأحكام 'العملية' والتوحيد أحكام 'اعتقادية'." },
+                    { "question": "ما وظيفة الأصولي؟", "answer": "وضع القواعد الإجمالية لاستنباط الأحكام." }
+                ]
+            }
+        ]
+    };
+
+    // تحميل البيانات في الصفحة
+    document.getElementById('bookTitle').innerText = data.book_title;
+    document.getElementById('authorName').innerText = "تأليف: " + data.author;
+    
+    const chapter = data.chapters[0];
+    document.getElementById('chapterTitle').innerText = chapter.chapter_name;
+    
+    let contentHtml = `<p><em>${chapter.content.introduction}</em></p>`;
+    chapter.content.sections.forEach(s => {
+        contentHtml += `<h3>${s.title}</h3><p>${s.details}</p>`;
+    });
+    document.getElementById('mainContent').innerHTML = contentHtml;
+
+    let quizHtml = "";
+    chapter.quiz.forEach((q, i) => {
+        quizHtml += `
+            <div class="quiz-item">
+                <span class="question">${i+1}. ${q.question}</span>
+                <span class="answer">💡 ${q.answer}</span>
+            </div>`;
+    });
+    document.getElementById('quizContainer').innerHTML = quizHtml;
+
+    // وظيفة التنقل بين الأزرار
+    function toggleView(view) {
+        const contentSec = document.getElementById('contentSection');
+        const quizSec = document.getElementById('quizSection');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+
+        if (view === 'quiz') {
+            contentSec.classList.remove('active');
+            quizSec.classList.add('active');
+            nextBtn.disabled = true;
+            prevBtn.disabled = false;
+        } else {
+            quizSec.classList.remove('active');
+            contentSec.classList.add('active');
+            nextBtn.disabled = false;
+            prevBtn.disabled = true;
+        }
+    }
+</script>
+
+</body>
+</html>
